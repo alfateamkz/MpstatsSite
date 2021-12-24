@@ -1,0 +1,209 @@
+﻿@using MpstatsSite.Models
+@{
+    ViewBag.Title = "Home Page";
+    Layout = null;  
+}
+@model MpstatsSite.ViewModels.IndexViewModel
+
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Дашборд</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+</head>
+
+<style>
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 310px;
+        max-width: 1200px;
+        margin: 1em auto;
+    }
+
+    #container {
+        height: 400px;
+    }
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+</style>
+<body>
+
+    <div style="width: 100%;height: 50px;margin-left: 60px; display: inline-table;">
+        <div style="width: 50%; display: inline-block;">
+            <h2>Категория : @Model.Category</h2>
+        </div>
+
+        <div style="width: 50%; display: inline-block;">
+            <h2>Доля продаж Hausland за последние 30 дней :  @Math.Round(Model.OurTotalVolume,2) % </h2>
+        </div>
+    </div>
+    <div>
+        <select name="category"
+                style="width: 20%; margin-left: 60px; display: inline-block;"
+                onchange="location = this.value;">
+            <option value="" selected disabled hidden>Выберите категорию...</option>
+            <option value="/Home/Index?category=Ершик для унитаза">Ершик для унитаза</option>
+            <option value="/Home/Index?category=Органайзеры/Органайзер для хранения">Органайзер для хранения</option>
+            <option value="/Home/Index?category=Красота/Аксессуары/Органайзеры и флаконы">Органайзер для косметики</option>
+            <option value="/Home/Index?category=Здоровье/Уход за полостью рта">Зубная щетка мягкая</option>
+            <option value="/Home/Index?category=Дом/Ванная/Коврики">Коврик для ванной</option>
+            <option value="/Home/Index?category=Дом/Хозяйственные товары/Товары для уборки/Салфетки для уборки">Салфетки для уборки</option>
+            <option value="/Home/Index?category=Дом/Гостиная/Коробки для хранения/Коробка для хранения">Коробка для хранения</option>
+            <option value="/Home/Index?category=Дом/Хранение вещей/Шкатулки">Шкатулка для украшений</option>
+        </select>
+    </div>
+
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <p class="highcharts-description">
+
+        </p>
+    </figure>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        var request = new XMLHttpRequest();
+
+        var stringDates = [];
+        var ourVolumes = [];
+        var otherVolumes = [];
+
+        request.open('GET', "/Home/IndexJson?category=@Model.Category");
+        request.responseType = 'text';
+        request.onload = function() {
+            try {
+                var text = JSON.parse(request.response);
+                console.log(text);
+                for (var i = 0; i < text.Info.VolumeForLastMonth.length; i++) {
+
+                    try {
+                        var strunix = text.Info.VolumeForLastMonth[i].Date;
+                        strunix = strunix.substring(6);
+                        var date = new Date(parseInt(strunix));
+                        date.setDate(date.getDate() - i);
+                        var dateStr = date.toLocaleDateString();
+                        stringDates.push(dateStr);
+                        ourVolumes.push(text.Info.VolumeForLastMonth[i].OurVolume);
+
+                        var otherVol = text.Info.VolumeForLastMonth[i].TotalVolume - text.Info.VolumeForLastMonth[i].OurVolume;
+                    otherVolumes.push(otherVol);
+
+                    }
+                    catch (e){
+                        alert(e);
+                    }
+                }
+                stringDates = stringDates.reverse();
+                ourVolumes = ourVolumes.reverse();
+                otherVolumes = otherVolumes.reverse();
+            }
+            catch (e)
+            {
+                alert(e);
+            }
+           
+
+            Highcharts.chart('container', {
+
+                chart: {
+                    type: 'column'
+                },
+
+                title: {
+                    text: ''
+                },
+
+                xAxis: {
+                    categories: stringDates
+                },
+
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: 'Выручка'
+                    }
+                },
+
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.series.name + ': ' + this.y + '<br/>' +
+                            'Total: ' + this.point.stackTotal + '<br/>' +
+                            'Выручка Hausland: ' + (this.point.stackTotal - this.y) + '<br/>' +
+                            'Процент: ' + ((this.point.stackTotal - this.y) / (this.point.stackTotal) * 100).toPrecision(2);
+
+                    }
+                },
+
+                plotOptions: {
+                    column: {
+                        stacking: 'normal'
+                    }
+                },
+
+                series: [{
+                    name: 'Выручка в категории',
+                    data: otherVolumes,
+                    stack: 'male'
+                }, {
+                    name: 'Выручка Hausland',
+                    data: ourVolumes,
+                    stack: 'male'
+                }]
+            });
+
+
+        };
+        request.send();
+    });
+
+
+
+
+   
+</script>
+
+
+</body>
+</html>
