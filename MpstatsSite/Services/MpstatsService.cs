@@ -68,7 +68,9 @@ namespace MpstatsSite.Services
 
         public void CheckForViolators(List<BrandSeller> goods)
         {
-            foreach (var g in goods)
+            using (DatabaseConnection db = new DatabaseConnection())
+            {
+                foreach (var g in goods)
             {
 
 
@@ -83,8 +85,7 @@ namespace MpstatsSite.Services
                 }
                 if (!ourProduct)
                 {
-                    using(DatabaseConnection db = new DatabaseConnection())
-                    {
+                  
                         int count = db.Violators.Where(o =>
                             o.Name == g.Seller && o.Product == g.Name && o.Brand == g.Brand && !o.IsWatched).Count();
                         if (count == 0)
@@ -97,12 +98,13 @@ namespace MpstatsSite.Services
                                 Name = g.Seller,
                                 Product = g.Name
                             });
-                            db.SaveChanges();
                         }                  
                     }
                 }
+                db.SaveChanges();
+
             }
-           
+
         }
     }
 }
