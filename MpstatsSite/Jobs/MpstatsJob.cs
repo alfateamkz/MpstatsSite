@@ -38,8 +38,9 @@ namespace MpstatsSite.Jobs
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromMinutes(240));
 
+
+                TimeSpan.FromMinutes(240));
             return Task.CompletedTask;
         }
 

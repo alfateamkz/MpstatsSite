@@ -175,6 +175,10 @@
       <Project>{4732185e-c552-4db3-a480-b2e00ca75c89}</Project>
       <Name>MpstatsAPIWrapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MpstatsSite\MpstatsSite.csproj">
+      <Project>{F10D3AFA-5CAF-4C59-A046-42269E1883CD}</Project>
+      <Name>MpstatsSite</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TelegramMpBot.Database\TelegramMpBot.Database.csproj">
       <Project>{2b6a53a3-9915-4e91-93e0-888b0eacd05b}</Project>
       <Name>TelegramMpBot.Database</Name>

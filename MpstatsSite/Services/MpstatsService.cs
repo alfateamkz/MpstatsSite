@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MpstatsSite.Helpers;
 using TelegramMpBot.Database;
 
 namespace MpstatsSite.Services
@@ -68,9 +69,7 @@ namespace MpstatsSite.Services
 
         public void CheckForViolators(List<BrandSeller> goods)
         {
-            using (DatabaseConnection db = new DatabaseConnection())
-            {
-                foreach (var g in goods)
+            foreach (var g in goods)
             {
 
 
@@ -86,11 +85,11 @@ namespace MpstatsSite.Services
                 if (!ourProduct)
                 {
                   
-                        int count = db.Violators.Where(o =>
+                        int count = JsonHelper.GetViolatorsFromDB().Where(o =>
                             o.Name == g.Seller && o.Product == g.Name && o.Brand == g.Brand && !o.IsWatched).Count();
                         if (count == 0)
                         {
-                            db.Violators.Add(new Violator
+                            JsonHelper.AddViolatorToDB(new Violator
                             {
                                 Brand = g.Brand,
                                 Date = DateTime.Now,
@@ -101,10 +100,6 @@ namespace MpstatsSite.Services
                         }                  
                     }
                 }
-                db.SaveChanges();
-
-            }
-
         }
     }
 }

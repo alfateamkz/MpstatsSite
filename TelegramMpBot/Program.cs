@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MpstatsSite.Helpers;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramMpBot.Database;
@@ -40,9 +41,7 @@ namespace TelegramMpBot
             Console.WriteLine(msg.Text);
             if (msg.Text.Equals("Уведомления", StringComparison.OrdinalIgnoreCase))
             {
-                using (DatabaseConnection db = new DatabaseConnection())
-                {
-                    var list = db.Violators.Where(o => !o.IsWatched).ToList();
+                var list = JsonHelper.GetViolatorsFromDB();
                     if (list.Count == 0)
                     {
                         await BotClient.SendTextMessageAsync(e.Message.Chat.Id, "Пока нет нарушителей. Но это только пока=)", replyMarkup: GetButtons());
@@ -55,7 +54,6 @@ namespace TelegramMpBot
                         {
                             report += $"Имя : {violator.Name}   Бренд : {violator.Brand}   Товар : {violator.Product}  \n";
                             violator.IsWatched = true;
-                            db.Update(violator);
                             if (counter % 12 ==0)
                             {
                                 try
@@ -69,10 +67,7 @@ namespace TelegramMpBot
                                 }
                             }
                         }
-                     
-                        await db.SaveChangesAsync();
                     }
-                }
             }
             else
             {
