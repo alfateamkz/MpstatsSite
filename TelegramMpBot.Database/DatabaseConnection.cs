@@ -13,7 +13,8 @@ namespace TelegramMpBot.Database
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=WIN-LIVFRVQFMKO\SQLEXPRESS;Database=tgbotdb;Trusted_Connection=True;");           
+            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=tgbotdb;Trusted_Connection=True;");
+            //optionsBuilder.UseSqlServer(@"Server=(localdb)\12.0V_shared;Database=tgbotdb;Trusted_Connection=True;");           
         }
     }
 

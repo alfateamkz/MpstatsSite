@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Hosting;
+using System.Web.Mvc;
 using MpstatsSite.Helpers;
 using MpstatsSite.Models;
 
@@ -138,11 +140,14 @@ namespace MpstatsSite.Jobs
 
         private void LogToTxt(string log)
         {
-            using (StreamWriter sw = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "log.txt"), true,
-                       Encoding.UTF8))
-            {
-                sw.WriteLine(log);
-            }
+            var pathToFile = HostingEnvironment.ApplicationPhysicalPath;
+            File.AppendAllText(Path.Combine(pathToFile, "log.txt"), log+Environment.NewLine+Environment.NewLine+Environment.NewLine);
+
+            //using (StreamWriter sw = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "log.txt"), true,
+            //           Encoding.UTF8))
+            //{
+            //    sw.WriteLine(log);
+            //}
         }
         public void Dispose()
         {
