@@ -142,12 +142,6 @@ namespace MpstatsSite.Jobs
         {
             var pathToFile = HostingEnvironment.ApplicationPhysicalPath;
             File.AppendAllText(Path.Combine(pathToFile, "log.txt"), log+Environment.NewLine+Environment.NewLine+Environment.NewLine);
-
-            //using (StreamWriter sw = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "log.txt"), true,
-            //           Encoding.UTF8))
-            //{
-            //    sw.WriteLine(log);
-            //}
         }
         public void Dispose()
         {
