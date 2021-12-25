@@ -70,6 +70,8 @@ namespace MpstatsSite.Services
         {
             foreach (var g in goods)
             {
+
+
                 bool ourProduct = false;
                 foreach (var business in OwnBusinesses)
                 {
